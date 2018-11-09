@@ -2,14 +2,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Graph {
+public class Graph implements Cloneable {
 
-	private String name;
 	private int[][] edgeWeights;
 	private int size;
+	private String filename;
 	
 	public Graph(String filename) throws FileNotFoundException{
-		File file = new File(filename);		
+		this.filename = filename;
+		File file = new File(filename);
 		Scanner scanner = new Scanner(file);
 		String scannedString = "";
 		scanner.nextLine();
@@ -37,9 +38,36 @@ public class Graph {
 				z++;
 				x=z;
 			}
-		}
-		
+		}		
 	}
+	
+	public Graph(int size, int[][] edgeWeights){
+		this.size = size;
+		this.edgeWeights = edgeWeights;
+	}
+	
+	public int weight(int from, int to){
+		return edgeWeights[from][to];
+	}
+	
+	public int[][] matrix(){
+		return edgeWeights;
+	}
+	
+	public void deleteNode(int node){
+		//delete a node from the graph, along with all incoming and outgoing edges
+	}
+	
+	public Graph clone(){
+		int[][] cloneWeights = new int[size][size];
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++){
+				cloneWeights[i][j] = edgeWeights[i][j];
+			}
+		}
+		return new Graph(size, cloneWeights);
+	}
+	
 	
 	public void PrintEdgeWeights(){
 		String out = "";
@@ -52,4 +80,9 @@ public class Graph {
 		System.out.println(out);		
 	}
 	
+
+	public String getFilename() {
+		return filename;
+	}
+
 }
