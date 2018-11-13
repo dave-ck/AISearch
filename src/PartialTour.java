@@ -1,86 +1,90 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
-public class PartialTour {
+public class PartialTour extends Tour {
 
-	private ArrayList<Integer> cities;
 	private HashSet<Integer> unvisitedCities;
-	private Graph graph;
 	private int weight;
-	private int root;
-	private int head;
+	private int tail;
 
 	// done & tested
 	public PartialTour(Graph g) {
-		this.cities = new ArrayList<Integer>();
-		this.graph = g;
-		this.weight = 0;
+		super(g);
 		this.unvisitedCities = new HashSet<Integer>();
 		/*
 		 * cities referred to by the index they are held at (n-1 where n is the
 		 * of the city in the input file)
 		 */
-		for (int i = 0; i < g.matrix().length; i++) {
+		for (int i = 0; i < getMatrix().length; i++) {
 			unvisitedCities.add(i);
 		}
 	}
 
-	// done
-	public int getWeight() {
-		return weight;
-	}
 	
-	//getter
-	public ArrayList<Integer> getCities() {
-		return cities;
+	public FullTour FullTour() {
+		if (isComplete()) {
+			return new FullTour(getGraph(), getCities());
+		}
+		System.out.println("An error occurred, returning ordered tour");
+		return new FullTour(getGraph());
 	}
 
-	//getter
+	// getter
 	public HashSet<Integer> getUnvisitedCities() {
 		return unvisitedCities;
 	}
 
-	//getter
-	public Graph getGraph() {
-		return graph;
-	}
-	
-	// done & tested
-	public boolean isComplete() {
-		return graph.matrix().length == cities.size();
-	}
-
-	// done & tested
-	public int size() {
-		return cities.size();
-	}
-	
-	//done & tested
-	public boolean visits(int city){
-		return cities.contains(city);
-	}
-	
-	//done & tested (not for weight functionality)
+	// done & tested (not for weight functionality)
 	public boolean append(int target) {
 		if (unvisitedCities.remove(target)) {
-			if(cities.isEmpty()){
-				this.root = target;
-			}
-			else{
-				this.weight += graph.weight(head, target);
-			}
-			cities.add(target);
-			this.head=target;
+			/*
+			 * This code is made redundant by the computeWeight() method - could
+			 * be redone if there is a need to optimize, but computing weight is
+			 * O(n) --> not an issue
+			 * 
+			 */
+			/**if (!getCities().isEmpty()) {
+				weight += getGraph().weight(tail, target);
+			}**/
+
+			getCities().add(target);
+			this.tail = target;
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	public boolean greedyAppend(){
+		if(this.getCities().size()==0){
+			return false;
+		}
+		int bestNeighbor = 0;
+		int bestWeight = getGraph().getMaxWeight();
+		for(int i: unvisitedCities){
+			if(bestWeight >= getGraph().weight(tail, i)){
+				bestWeight = getGraph().weight(tail, i);
+				bestNeighbor = i;
+			}
+		}
+		append(bestNeighbor);
+		if(this.isComplete()){
+			return false;
+		}
+		return true;
+	}
+	
+	
+	private int getTail() {
+		return getCities().get(getCities().size()-1);
+	}
+
+
 	// done & tested
 	public PartialTour extend(int target) {
-		PartialTour newTour = new PartialTour(graph);
-		for (int i : cities) {
+		PartialTour newTour = new PartialTour(getGraph());
+		for (int i : getCities()) {
 			newTour.append(i);
 		}
 		newTour.append(target);
@@ -89,11 +93,11 @@ public class PartialTour {
 
 	// done & tested
 	public PartialTour backTrack(int distance) {
-		if (cities.size() < distance) {
-			return new PartialTour(graph);
+		if (getCities().size() < distance) {
+			return new PartialTour(getGraph());
 		}
-		PartialTour newTour = new PartialTour(graph);
-		for (int i : cities.subList(0, cities.size() - distance)) {
+		PartialTour newTour = new PartialTour(getGraph());
+		for (int i : getCities().subList(0, getCities().size() - distance)) {
 			newTour.append(i);
 		}
 		return newTour;
@@ -102,18 +106,12 @@ public class PartialTour {
 	// done
 	// incorrect implementation
 	public String toString() {
-		String stringForm = "NAME = " + graph.getFilename() + ",\nTOURSIZE = " + cities.size() + ",\nLENGTH = " + this.getWeight() + ",\n";
-		for (Integer i : cities) {
-			stringForm += i + ",";
-		}
-		//remove below to produce output file
+		String stringForm = super.toString();
 		stringForm += "\nUnvisited cities: ";
 		for (Integer i : unvisitedCities) {
 			stringForm += i + ",";
 		}
 		return stringForm;
 	}
-
-	
 
 }
