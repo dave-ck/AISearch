@@ -21,9 +21,9 @@ public class FullTour extends Tour{
 	}
 
 	public String toString(){
-		String stringForm = "NAME = " + getGraph().getFilename() + ",\nTOURSIZE = " + getCities().size() + ",\nLENGTH = " + this.computeWeight() + ",\n";
+		String stringForm = "NAME = " + getGraph().getFilename().substring(3, getGraph().getFilename().length()-4) + ",\nTOURSIZE = " + getCities().size() + ",\nLENGTH = " + this.computeWeight() + ",\n";
 		for (Integer i : getCities()) {
-			stringForm += i + ",";
+			stringForm += (i+1) + ",";  //+1 to account for city indexing starting at 1, not 0
 		}
 		stringForm = stringForm.substring(0, stringForm.length()-1); //delete the last comma
 		return stringForm;	
