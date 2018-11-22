@@ -11,26 +11,30 @@ public class TSP {
 		testCall();
 	}
 	
-	public static void testCall() throws Exception{
+	public static void testCall() throws Exception {
 		ArrayList<Graph> graphs = readGraphs();
 		Graph graph = graphs.get(9);
-		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), 10, 1.000001);
+		//found there are seldom changes made at temperatures under 0.05 --> set approxZero to 0.01 at the lowest;
+		// seldom changes made at temperatures above 30 --> set startTemp to 25 at the highest
+		double startTemp = 10, beta = 1.0000005, approxZero=0.05;
+		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, beta, approxZero);
+		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
 		System.out.println("Result weight:" + result.computeWeight());
 		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph).computeWeight());
 	}
 	
-	public static void masterCall()throws Exception{
+	public static void masterCall() throws Exception {
 		ArrayList<FullTour> greedyTours = new ArrayList<>();
 		ArrayList<FullTour> annealingTours = new ArrayList<>();
 		ArrayList<FullTour> hillClimbingTours = new ArrayList<>();
-		for(Graph graph : readGraphs()){
-			System.out.println("Currently processing graph of size "+graph.getSize());
+		for (Graph graph : readGraphs()) {
+			System.out.println("Currently processing graph of size " + graph.getSize());
 			//Greedy
 			greedyTours.add(StartPointGenerator.Greedy(graph));
 			// Hill Climbing
 			hillClimbingTours.add(SimAnnealer.HillClimb(StartPointGenerator.Greedy(graph)));
 			//Annealing
-			annealingTours.add(SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), 1000, 1.02));
+			annealingTours.add(SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), 1000, 1.02, 0.01));
 		}
 		System.out.println("writeToFile called");
 		
