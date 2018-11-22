@@ -6,7 +6,7 @@ public class Tests {
 		Graph g = new Graph("NEWAISearchfile012.txt");
 		//g.PrintEdgeWeights();
 		PartialTour pt = new PartialTour(g);
-		System.out.println(SimAnnealer.Schedule(50, 1.002, 0.0001).size());
+		System.out.println(SimAnnealer.ExponentialSchedule(50, 1.002, 0.0001).size());
 		
 	}
 

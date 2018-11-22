@@ -39,7 +39,7 @@ public class FullTour extends Tour {
 		return successors;
 	}
 	
-	public FullTour randomSuccessor() {
+	public FullTour randomSwappedSuccessor() {
 		Random r = new Random();
 		int i = 0;
 		int j = 0;
@@ -48,6 +48,17 @@ public class FullTour extends Tour {
 			j = r.nextInt(this.size());
 		}
 		return swapped(i,j);
+	}
+	
+	public FullTour randomReversedSuccessor(){
+		Random r = new Random();
+		int i = 0;
+		int j = 0;
+		while(i==j){
+			i = r.nextInt(this.size());
+			j = r.nextInt(this.size());
+		}
+		return subReversed(i, j);
 	}
 	
 	
@@ -63,5 +74,23 @@ public class FullTour extends Tour {
 		swappedTour.getCities().set(cityIndex2, this.getCities().get(cityIndex1));
 		swappedTour.getCities().set(cityIndex1, this.getCities().get(cityIndex2));
 		return swappedTour;
+	}
+	
+	public FullTour subReversed(int cityIndex1, int cityIndex2){
+		if(cityIndex1>cityIndex2){
+			int temp = cityIndex1;
+			cityIndex1 = cityIndex2;
+			cityIndex2 = temp;
+		}
+		// TODO: reread and verify soundness
+		FullTour subReversed = this.clone();
+		ArrayList<Integer> subCities = new ArrayList<>();
+		subCities.addAll(this.getCities().subList(0, cityIndex1));
+		for(int i : this.getCities().subList(cityIndex1, cityIndex2)){
+			subCities.add(cityIndex1, i);
+		}
+		subCities.addAll(this.getCities().subList(cityIndex2, this.getCities().size()));
+		subReversed.setCities(subCities);
+		return subReversed;
 	}
 }

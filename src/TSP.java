@@ -8,17 +8,34 @@ public class TSP {
 	
 	public static void main(String[] args) throws Exception {
 		//masterCall();     //writes tour files for every implemented algorithm
+
+		
 		testCall();
+	}
+	
+	public static void parallelCall(){
+		ArrayList loops = new ArrayList<Integer>();
+		loops.add(1);
+		loops.add(1);
+		
+		loops.parallelStream().forEach( (i) -> {
+			try {
+				testCall();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	public static void testCall() throws Exception {
 		ArrayList<Graph> graphs = readGraphs();
 		Graph graph = graphs.get(9);
 		//found there are seldom changes made at temperatures under 0.05 --> set approxZero to 0.01 at the lowest;
-		// seldom changes made at temperatures above 30 --> set startTemp to 25 at the highest
-		double startTemp = 10, beta = 1.0000005, approxZero=0.05;
-		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, beta, approxZero);
-		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
+		// seldom changes made at temperatures above 5 --> set startTemp to 7 at the highest;
+		// beta as small as possible with good runtime
+		double startTemp = 100, alpha = 0.1, beta = 1.001, approxZero=0.000000000001;
+		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, alpha, approxZero);
+		System.out.println("Params: startTemp = " + startTemp + " alpha = " + alpha + " approxZero = " + approxZero);
 		System.out.println("Result weight:" + result.computeWeight());
 		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph).computeWeight());
 	}
