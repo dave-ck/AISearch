@@ -1,0 +1,27 @@
+Simulated-annealing:
+    current   initial state;
+    for t = 1 to infinity do
+        T = schedule[t]
+        if T = 0 then return current
+        else
+            choose a successor succ of current at random
+            deltaE =  f(succ) − f(current)      #negative number
+            if deltaE >= 0 then current = successor
+            else current = successor only with probability e^(deltaE/T)
+
+Generating the schedule:
+    schedule[t] = schedule[t-1]/BETA, with BETA a user-defined constant
+
+Hill-climb:
+current = initial state
+    loop do
+    successor = successor of current with highest value
+    if f(successor) <= f(current) then return current
+    else current = successor
+
+
+
+Definitions
+f(x): objective function f, which we are attempting to maximize - perhaps (1/weight(x))
+    alternatively, attempt to minimize weight(x) directly...
+deltaE is the difference in "optimality" - large, negative deltaE means significant loss in potential, while

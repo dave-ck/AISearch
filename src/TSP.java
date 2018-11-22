@@ -7,6 +7,19 @@ import java.util.Collection;
 public class TSP {
 	
 	public static void main(String[] args) throws Exception {
+		//masterCall();     //writes tour files for every implemented algorithm
+		testCall();
+	}
+	
+	public static void testCall() throws Exception{
+		ArrayList<Graph> graphs = readGraphs();
+		Graph graph = graphs.get(9);
+		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), 10, 1.000001);
+		System.out.println("Result weight:" + result.computeWeight());
+		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph).computeWeight());
+	}
+	
+	public static void masterCall()throws Exception{
 		ArrayList<FullTour> greedyTours = new ArrayList<>();
 		ArrayList<FullTour> annealingTours = new ArrayList<>();
 		ArrayList<FullTour> hillClimbingTours = new ArrayList<>();
@@ -17,7 +30,7 @@ public class TSP {
 			// Hill Climbing
 			hillClimbingTours.add(SimAnnealer.HillClimb(StartPointGenerator.Greedy(graph)));
 			//Annealing
-			//hillClimbingTours.add(SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph)));
+			annealingTours.add(SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), 1000, 1.02));
 		}
 		System.out.println("writeToFile called");
 		
@@ -28,14 +41,15 @@ public class TSP {
 	
 	//TODO: change ...file58.txt to ...file058.txt
 	public static void writeToFile(String pathName, ArrayList<FullTour> tours) throws Exception {
+		System.out.println("Printing tours...");
 		new File(pathName).mkdirs();
 		for (FullTour tour : tours) {
 			String outputFileName = "tourNEWAISearchfile" + tour.size() + ".txt";
 			PrintWriter writer = new PrintWriter(pathName + "/" + outputFileName, "UTF-8");
 			writer.println(tour);
-			System.out.println("Successfully printed tour" + outputFileName);
 			writer.close();
 		}
+		System.out.println("Successfully printed tours");
 	}
 	
 	
@@ -45,10 +59,10 @@ public class TSP {
 		ArrayList<Graph> graphs = new ArrayList<>();
 		for (String ext : fileNumbers) {
 			String fileName = "NEWAISearchfile" + ext + ".txt";
-			System.out.println("Reading graph from: " + fileName);
 			Graph g = new Graph(fileName);
 			graphs.add(g);
 		}
+		System.out.println("Graphs were read successfully");
 		return graphs;
 	}
 	

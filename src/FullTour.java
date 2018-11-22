@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Random;
 
 public class FullTour extends Tour {
 	
@@ -29,15 +29,27 @@ public class FullTour extends Tour {
 		return stringForm;
 	}
 	
-	public HashSet<FullTour> getSuccessors() {
-		HashSet<FullTour> successors = new HashSet<>();
+	public ArrayList<FullTour> getSuccessors() {
+		ArrayList<FullTour> successors = new ArrayList<>();
 		for (int i = 0; i < this.size(); i++) {
 			for (int j = 0; j < this.size(); j++) {
-				successors.add(swapped(i,j));
+				successors.add(swapped(i, j));
 			}
 		}
 		return successors;
 	}
+	
+	public FullTour randomSuccessor() {
+		Random r = new Random();
+		int i = 0;
+		int j = 0;
+		while(i==j){
+			i = r.nextInt(this.size());
+			j = r.nextInt(this.size());
+		}
+		return swapped(i,j);
+	}
+	
 	
 	public FullTour clone() {
 		ArrayList<Integer> cloneCities = new ArrayList<>();
