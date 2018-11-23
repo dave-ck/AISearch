@@ -8,24 +8,35 @@ public class SimAnnealer {
 		//TODO: IMPLEMENT SO CLONING ONLY OCCURS WHEN A NEW OPTIMUM IS FOUND, NOT AT EVERY STEP.
 		System.out.println("SimAnneal Called");
 		Random random = new Random();
-		//ArrayList<Double> schedule = ExponentialSchedule(startTemp, beta, 0.00001);
 		FullTour currentTour = initialTour;
+		int currentWeight = initialTour.computeWeight();
 		FullTour currentBest = initialTour;
+		int currentBestWeight = initialTour.computeWeight();
+		FullTour successor;
+		int successorWeight;
 		int time = 0;
 		for(double currentTemperature : QuadraticMultiplicativeSchedule(startTemp, beta, approxZero)){
-			FullTour successor = currentTour.randomReversedSuccessor();
-			int deltaE = successor.computeWeight() - currentTour.computeWeight();
+			//make cooling non-monotonic adaptive
+			double adaptiveFactor = 1 + ((currentWeight-currentBestWeight)/currentWeight);
+			currentTemperature *= adaptiveFactor;
+			//comment out these 2 lines to make monotonic and non-adaptive
+			successor = currentTour.randomReversedSuccessor();
+			currentWeight = currentTour.computeWeight();
+			successorWeight = successor.computeWeight();
+			int deltaE = successorWeight - currentWeight;
 			if (deltaE <= 0) {
 				currentTour = successor;
 			} else {
 				double probability = Math.exp(-1 * deltaE / currentTemperature);
 				if (random.nextDouble() < probability) {
 					currentTour = successor;
+					currentWeight = successorWeight;
 				}
 			}
-			if (currentBest.computeWeight() > currentTour.computeWeight()) {
+			if (currentBestWeight > currentWeight) {
 				currentBest = currentTour;
-				System.out.println("Time: " + time + ", current temperature: " + currentTemperature +  ", current best weight: " + currentBest.computeWeight());
+				currentBestWeight = currentWeight;
+				System.out.println("Time: " + time + ", current temperature: " + currentTemperature +  ", current best weight: " + currentBestWeight);
 			}
 			time++;
 		}
