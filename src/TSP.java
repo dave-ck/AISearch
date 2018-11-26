@@ -6,17 +6,28 @@ import java.util.Collection;
 
 public class TSP {
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		//masterCall();     //writes tour files for every implemented algorithm
-
-		
-		testCall();
+		double startTime = System.currentTimeMillis();
+		try {
+			testCall();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		double singleThreadTime = System.currentTimeMillis()-startTime;
+		startTime = System.currentTimeMillis();
+		parallelCall();
+		double parallelTimeTaken = System.currentTimeMillis()-startTime;
+		System.out.println("Time to run in parallel: " + parallelTimeTaken + " ms");
+		System.out.println("Per tour: " + (parallelTimeTaken/12) + " ms");
+		System.out.println("Time taken to run \"normally\": " + singleThreadTime + " ms");
 	}
 	
 	public static void parallelCall(){
 		ArrayList loops = new ArrayList<Integer>();
-		loops.add(1);
-		loops.add(1);
+		for (int i = 0; i < 12; i++){
+			loops.add(1);
+		}
 		
 		loops.parallelStream().forEach( (i) -> {
 			try {
@@ -33,11 +44,12 @@ public class TSP {
 		//found there are seldom changes made at temperatures under 0.05 --> set approxZero to 0.01 at the lowest;
 		// seldom changes made at temperatures above 5 --> set startTemp to 7 at the highest;
 		// beta as small as possible with good runtime
-		double startTemp = 100, alpha = 0.1, beta = 1.001, approxZero=0.000000000001;
-		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, alpha, approxZero);
-		System.out.println("Params: startTemp = " + startTemp + " alpha = " + alpha + " approxZero = " + approxZero);
+		double startTemp = 10, alpha = 0.1, beta = 1.00005 , approxZero=0.05;
+		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, beta, approxZero);
+		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
 		System.out.println("Result weight:" + result.computeWeight());
 		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph).computeWeight());
+		System.out.println("Graph size: " + graph.getSize());
 	}
 	
 	public static void masterCall() throws Exception {

@@ -15,7 +15,7 @@ public class SimAnnealer {
 		FullTour successor;
 		int successorWeight;
 		int time = 0;
-		for(double currentTemperature : QuadraticMultiplicativeSchedule(startTemp, beta, approxZero)){
+		for(double currentTemperature : ExponentialSchedule(startTemp, beta, approxZero)){
 			//make cooling non-monotonic adaptive
 			double adaptiveFactor = 1 + ((currentWeight-currentBestWeight)/currentWeight);
 			currentTemperature *= adaptiveFactor;
@@ -45,8 +45,8 @@ public class SimAnnealer {
 
 	
 	public static ArrayList<Double> ExponentialSchedule(double startTemp, double beta, double approxZero) {
+		System.out.println("Generating schedule...");
 		double temperature = startTemp;
-		
 		ArrayList<Double> schedule = new ArrayList<>();
 		schedule.add(startTemp);
 		int currentIndex = 0;
@@ -55,6 +55,7 @@ public class SimAnnealer {
 			schedule.add(temperature);
 			currentIndex++;
 		}
+		System.out.println("Successfully generated schedule of length: " + schedule.size() +".");
 		return schedule;
 	}
 	
