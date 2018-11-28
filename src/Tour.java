@@ -58,9 +58,12 @@ public class Tour {
 	}
 
 	public int computeWeight() {
+		if (size()==0){
+			return 0;
+		}
 		int weight = 0;
 		int from = getRoot();
-		int to = 0;
+		int to = -1;
 		for (int i : cities) {
 			to = i;
 			weight += matrix[from][to];
