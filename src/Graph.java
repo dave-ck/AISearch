@@ -1,14 +1,15 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Graph implements Cloneable {
-
+	
 	private int[][] edgeWeights;
 	private int size;
 	private String filename;
 	private int maxWeight;
-
+	private int minWeight;
+	
 	public Graph(String filename) throws FileNotFoundException {
 		this.filename = filename;
 		File file = new File(filename);
@@ -25,12 +26,19 @@ public class Graph implements Cloneable {
 		}
 		scanner.close();
 		maxWeight = 0;
+		minWeight = -1;
 		// for each element in the input, do fancy things
 		int x = 0, y = 0, z = 0;
 		for (String i : scannedString.split(",")) {
 			int weight = Integer.parseInt(i);
-			if(weight>maxWeight){
+			if(minWeight==-1){
+				minWeight = weight;
+			}
+			if (weight > maxWeight) {
 				maxWeight = weight;
+			}
+			if (weight < minWeight){
+				minWeight = weight;
 			}
 			if (x == y) {
 				x++;
@@ -45,25 +53,25 @@ public class Graph implements Cloneable {
 			}
 		}
 	}
-
+	
 	public Graph(int size, int[][] edgeWeights) {
 		this.size = size;
 		this.edgeWeights = edgeWeights;
 	}
-
+	
 	public int weight(int from, int to) {
 		return edgeWeights[from][to];
 	}
-
+	
 	public int[][] matrix() {
 		return edgeWeights;
 	}
-
+	
 	public void deleteNode(int node) {
 		// delete a node from the graph, along with all incoming and outgoing
 		// edges
 	}
-
+	
 	public Graph clone() {
 		int[][] cloneWeights = new int[size][size];
 		for (int i = 0; i < size; i++) {
@@ -73,7 +81,7 @@ public class Graph implements Cloneable {
 		}
 		return new Graph(size, cloneWeights);
 	}
-
+	
 	public void PrintEdgeWeights() {
 		String out = "";
 		for (int[] row : edgeWeights) {
@@ -84,34 +92,39 @@ public class Graph implements Cloneable {
 		}
 		System.out.println(out);
 	}
-
+	
 	public String getFilename() {
 		return filename;
 	}
-
-
+	
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+	
+	
 	public int[][] getEdgeWeights() {
 		return edgeWeights;
 	}
-
+	
 	public void setEdgeWeights(int[][] edgeWeights) {
 		this.edgeWeights = edgeWeights;
 	}
-
+	
 	public int getSize() {
 		return size;
 	}
-
+	
 	public void setSize(int size) {
 		this.size = size;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
 	}
 	
 	public int getMaxWeight() {
 		return maxWeight;
 	}
-
+	
+	public int getMinWeight() {
+		return minWeight;
+	}
+	
+	
 }
