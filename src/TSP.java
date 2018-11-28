@@ -6,8 +6,31 @@ import java.util.Collection;
 
 public class TSP {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		//masterCall();     //writes tour files for every implemented algorithm
+		StartPointGenerator.gatedSearch(readGraphs().get(3));
+		System.out.println(StartPointGenerator.Greedy(readGraphs().get(3)));
+	}
+	
+	public static void testCall() throws Exception{
+		double startTemp = 3, alpha = 0.1, beta = 1.00001 , approxZero=0.00001;
+		ArrayList<Graph> graphs = readGraphs();
+		Graph testGraph = graphs.get(1);
+		FullTour leekAhead = StartPointGenerator.lookAhead(testGraph);
+		FullTour greedy = StartPointGenerator.Greedy(testGraph);
+		FullTour annealGreedy = SimAnnealer.SimAnneal(greedy, startTemp, beta, approxZero);
+		FullTour annealLookAhead = SimAnnealer.SimAnneal(leekAhead, startTemp, beta, approxZero);
+		System.out.println("Weight for 4-lookahead: " + leekAhead.computeWeight());
+		System.out.println("Weight for greedy: " + greedy.computeWeight());
+		System.out.println("Weight for annealed greedy: " + annealGreedy.computeWeight());
+		System.out.println("Weight for annealed lookahead: " + annealLookAhead.computeWeight());
+		ArrayList results = new ArrayList<FullTour>();
+		results.add(greedy);
+		writeToFile("Greedy", results);
+	}
+	
+	
+	public static void timeComparison() throws Exception{
 		double startTime = System.currentTimeMillis();
 		try {
 			testCall();
@@ -16,40 +39,44 @@ public class TSP {
 		}
 		double singleThreadTime = System.currentTimeMillis()-startTime;
 		startTime = System.currentTimeMillis();
-		parallelCall();
+		writeToFile("ParallelOutput", parallelCall());
+		
 		double parallelTimeTaken = System.currentTimeMillis()-startTime;
 		System.out.println("Time to run in parallel: " + parallelTimeTaken + " ms");
 		System.out.println("Per tour: " + (parallelTimeTaken/12) + " ms");
 		System.out.println("Time taken to run \"normally\": " + singleThreadTime + " ms");
 	}
 	
-	public static void parallelCall(){
+	public static ArrayList<FullTour> parallelCall(){
 		ArrayList loops = new ArrayList<Integer>();
 		for (int i = 0; i < 12; i++){
 			loops.add(1);
 		}
+		ArrayList results = new ArrayList<FullTour>();
 		
 		loops.parallelStream().forEach( (i) -> {
 			try {
-				testCall();
+				results.add(annealTest());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
+		return results;
 	}
 	
-	public static void testCall() throws Exception {
+	public static FullTour annealTest() throws Exception {
 		ArrayList<Graph> graphs = readGraphs();
-		Graph graph = graphs.get(9);
+		Graph graph = graphs.get(1);
 		//found there are seldom changes made at temperatures under 0.05 --> set approxZero to 0.01 at the lowest;
 		// seldom changes made at temperatures above 5 --> set startTemp to 7 at the highest;
 		// beta as small as possible with good runtime
-		double startTemp = 10, alpha = 0.1, beta = 1.00005 , approxZero=0.05;
+		double startTemp = 10, alpha = 0.1, beta = 1.0001 , approxZero=0.01;
 		FullTour result = SimAnnealer.SimAnneal(StartPointGenerator.Greedy(graph), startTemp, beta, approxZero);
 		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
 		System.out.println("Result weight:" + result.computeWeight());
 		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph).computeWeight());
 		System.out.println("Graph size: " + graph.getSize());
+		return result;
 	}
 	
 	public static void masterCall() throws Exception {
@@ -77,7 +104,11 @@ public class TSP {
 		System.out.println("Printing tours...");
 		new File(pathName).mkdirs();
 		for (FullTour tour : tours) {
-			String outputFileName = "tourNEWAISearchfile" + tour.size() + ".txt";
+			String x = "";
+			if (tour.size() < 99){
+				x += "0";
+			}
+			String outputFileName = "tourNEWAISearchfile" + x + tour.size() + ".txt";
 			PrintWriter writer = new PrintWriter(pathName + "/" + outputFileName, "UTF-8");
 			writer.println(tour);
 			writer.close();
