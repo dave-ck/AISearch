@@ -15,15 +15,15 @@ public class BoundedPriorityQueue<E> extends ArrayList<E>{
 	
 	@Override
 	public boolean add(E e){
-		if (size() < bound){
+		if (size() <= bound){
 			super.add(e);
 			Collections.sort(this, eComparator);
 			return true;
 		}
 		// if e is better than the worst existing element
-		if (eComparator.compare(get(bound-1), e)>0){
+		if (eComparator.compare(get(bound), e)>0){
 			//remove the "worst" existing element, substitute with e
-			this.remove(bound-1);
+			this.remove(bound);
 			this.add(e);
 			Collections.sort(this, eComparator);
 			return true;

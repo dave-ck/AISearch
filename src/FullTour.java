@@ -5,6 +5,11 @@ public class FullTour extends Tour {
 	
 	public FullTour(Graph g) {
 		super(g);
+		ArrayList<Integer> cities = new ArrayList<>();
+		for (int i = 0; i < g.getSize(); i++){
+			cities.add(i);
+		}
+		this.setCities(cities);
 	}
 	
 	public FullTour(Graph g, ArrayList<Integer> cities) {
@@ -92,5 +97,11 @@ public class FullTour extends Tour {
 		subCities.addAll(this.getCities().subList(cityIndex2, this.getCities().size()));
 		subReversed.setCities(subCities);
 		return subReversed;
+	}
+	
+	public ArrayList<Integer> neighbors(int city){
+		ArrayList<Integer> neighbors = new ArrayList<>();
+		getCities().indexOf(city);
+		return neighbors;
 	}
 }

@@ -3,8 +3,17 @@ import java.lang.Math;
 import java.util.Random;
 
 public class SimAnnealer {
+	double startTemp;
+	double beta;
+	double approxZero;
 	
-	public static FullTour SimAnneal(FullTour initialTour, double startTemp, double beta, double approxZero) {
+	public SimAnnealer(double startTemp, double beta, double approxZero){
+		this.startTemp = startTemp;
+		this.beta = beta;
+		this.approxZero = approxZero;
+	}
+	
+	public  FullTour SimAnneal(FullTour initialTour) {
 		//TODO: IMPLEMENT SO CLONING ONLY OCCURS WHEN A NEW OPTIMUM IS FOUND, NOT AT EVERY STEP.
 		System.out.println("SimAnneal Called");
 		Random random = new Random();
@@ -15,10 +24,13 @@ public class SimAnnealer {
 		FullTour successor;
 		int successorWeight;
 		int time = 0;
-		for(double currentTemperature : ExponentialSchedule(startTemp, beta, approxZero)){
+		double currentTemperature = startTemp;
+		System.out.println("Estimated schedule length: " + scheduleLength());
+		while (currentTemperature > approxZero){
+			double adaptedTemperature = currentTemperature;
 			//make cooling non-monotonic adaptive
 			double adaptiveFactor = 1 + ((currentWeight-currentBestWeight)/currentWeight);
-			currentTemperature *= adaptiveFactor;
+			adaptedTemperature *= adaptiveFactor;
 			//comment out these 2 lines to make monotonic and non-adaptive
 			successor = currentTour.randomReversedSuccessor();
 			currentWeight = currentTour.computeWeight();
@@ -27,7 +39,7 @@ public class SimAnnealer {
 			if (deltaE <= 0) {
 				currentTour = successor;
 			} else {
-				double probability = Math.exp(-1 * deltaE / currentTemperature);
+				double probability = Math.exp(-1 * deltaE / adaptedTemperature);
 				if (random.nextDouble() < probability) {
 					currentTour = successor;
 					currentWeight = successorWeight;
@@ -36,15 +48,23 @@ public class SimAnnealer {
 			if (currentBestWeight > currentWeight) {
 				currentBest = currentTour;
 				currentBestWeight = currentWeight;
-				System.out.println("Time: " + time + ", current temperature: " + currentTemperature +  ", current best weight: " + currentBestWeight);
+				System.out.println("Time: " + time + " adaptive factor: " + adaptiveFactor +
+						", current temperature: " + currentTemperature +  ", current best weight: " + currentBestWeight);
 			}
 			time++;
+			currentTemperature /= beta;
 		}
 		return currentBest;
 	}
 
+	//approximate schedule length given parameters
+	public  int scheduleLength(){
+		return (int) Math.floor((Math.log(startTemp) - Math.log(approxZero))/Math.log(beta));
+	}
 	
-	public static ArrayList<Double> ExponentialSchedule(double startTemp, double beta, double approxZero) {
+
+	
+	public  ArrayList<Double> ExponentialSchedule() {
 		System.out.println("Generating schedule...");
 		double temperature = startTemp;
 		ArrayList<Double> schedule = new ArrayList<>();
@@ -59,7 +79,7 @@ public class SimAnnealer {
 		return schedule;
 	}
 	
-	public static ArrayList<Double> QuadraticMultiplicativeSchedule(double startTemp, double beta, double approxZero) {
+	public  ArrayList<Double> QuadraticMultiplicativeSchedule() {
 		System.out.println("Generating schedule...");
 		double temperature = startTemp;
 		ArrayList<Double> schedule = new ArrayList<>();
@@ -76,7 +96,7 @@ public class SimAnnealer {
 	
 	
 	
-	public static FullTour HillClimb(FullTour initial) {
+	public  FullTour HillClimb(FullTour initial) {
 		FullTour current = initial;
 		FullTour optimal = initial;
 		int optimalWeight = initial.computeWeight();
