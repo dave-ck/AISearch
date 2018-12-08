@@ -5,7 +5,17 @@ import java.util.Random;
 
 public class Tests {
 	
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws Exception {
+		Graph g = new Graph("NEWAISearchfile180.txt");
+		GeneticSolver gen = new GeneticSolver(g, 50, 1000, 2, 0.2);
+		gen.greedyPopulate();
+		gen.run(300);
+		
+		
+	}
+	
+	
+	public static void test1() throws FileNotFoundException {
 		Graph g = new Graph("NEWAISearchfile012.txt");
 		ArrayList<Integer> fullList = new ArrayList<>();
 		BoundedPriorityQueue<Integer> priorityQueue =
@@ -33,5 +43,4 @@ public class Tests {
 			e.printStackTrace();
 		}
 	}
-	
 }

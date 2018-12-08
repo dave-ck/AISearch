@@ -13,6 +13,10 @@ public class BoundedPriorityQueue<E> extends ArrayList<E>{
 		this.eComparator = eComparator;
 	}
 	
+	public int getBound(){
+		return bound;
+	}
+	
 	@Override
 	public boolean add(E e){
 		if (size() <= bound){

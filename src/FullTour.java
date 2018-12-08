@@ -6,7 +6,7 @@ public class FullTour extends Tour {
 	public FullTour(Graph g) {
 		super(g);
 		ArrayList<Integer> cities = new ArrayList<>();
-		for (int i = 0; i < g.getSize(); i++){
+		for (int i = 0; i < g.getSize(); i++) {
 			cities.add(i);
 		}
 		this.setCities(cities);
@@ -48,18 +48,18 @@ public class FullTour extends Tour {
 		Random r = new Random();
 		int i = 0;
 		int j = 0;
-		while(i==j){
+		while (i == j) {
 			i = r.nextInt(this.size());
 			j = r.nextInt(this.size());
 		}
-		return swapped(i,j);
+		return swapped(i, j);
 	}
 	
-	public FullTour randomReversedSuccessor(){
+	public FullTour randomReversedSuccessor() {
 		Random r = new Random();
 		int i = 0;
 		int j = 0;
-		while(i==j){
+		while (i == j) {
 			i = r.nextInt(this.size());
 			j = r.nextInt(this.size());
 		}
@@ -81,8 +81,8 @@ public class FullTour extends Tour {
 		return swappedTour;
 	}
 	
-	public FullTour subReversed(int cityIndex1, int cityIndex2){
-		if(cityIndex1>cityIndex2){
+	public FullTour subReversed(int cityIndex1, int cityIndex2) {
+		if (cityIndex1 > cityIndex2) {
 			int temp = cityIndex1;
 			cityIndex1 = cityIndex2;
 			cityIndex2 = temp;
@@ -91,7 +91,7 @@ public class FullTour extends Tour {
 		FullTour subReversed = this.clone();
 		ArrayList<Integer> subCities = new ArrayList<>();
 		subCities.addAll(this.getCities().subList(0, cityIndex1));
-		for(int i : this.getCities().subList(cityIndex1, cityIndex2)){
+		for (int i : this.getCities().subList(cityIndex1, cityIndex2)) {
 			subCities.add(cityIndex1, i);
 		}
 		subCities.addAll(this.getCities().subList(cityIndex2, this.getCities().size()));
@@ -99,9 +99,11 @@ public class FullTour extends Tour {
 		return subReversed;
 	}
 	
-	public ArrayList<Integer> neighbors(int city){
+	public ArrayList<Integer> neighbors(int city) {
 		ArrayList<Integer> neighbors = new ArrayList<>();
-		getCities().indexOf(city);
+		int cityIndex = getCities().indexOf(city);
+		neighbors.add(getCities().get((cityIndex + 1)%size()));
+		neighbors.add(getCities().get((cityIndex - 1 + size())%size()));
 		return neighbors;
 	}
 }

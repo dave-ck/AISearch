@@ -1,15 +1,12 @@
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Vector;
+import java.util.*;
 
 public class TSP {
 	
 	public static void main(String[] args) throws Exception {
 		//masterCall();     //writes tour files for every implemented algorithm
-		writeToFile("Annealing", parallelAnnealing());
+		writeToFile("Annealing", bestOnly(parallelAnnealing()));
 	}
 	
 	public static void testCall() throws Exception{
@@ -31,6 +28,25 @@ public class TSP {
 	}
 	
 	
+	// compiles a list with only the best tour for each size in the input list
+	public static ArrayList<FullTour> bestOnly(Collection<FullTour> hasRepeats){
+		HashMap<Integer, FullTour> best = new HashMap<>();
+		HashSet<Integer> sizes = new HashSet<>();
+		for (FullTour ft : hasRepeats){
+			if (best.containsKey(ft.size())){
+				if (best.get(ft.size()).computeWeight() > ft.computeWeight()){
+					best.put(ft.size(), ft);
+				}
+			}
+			else {
+				best.put(ft.size(), ft);
+			}
+		}
+		ArrayList<FullTour> fullTourArrayList = new ArrayList<>();
+		fullTourArrayList.addAll(best.values());
+		return fullTourArrayList;
+	}
+	
 	public static void timeComparison() throws Exception{
 		double startTime = System.currentTimeMillis();
 		try {
@@ -51,8 +67,12 @@ public class TSP {
 	public static Vector<FullTour> parallelAnnealing() throws Exception{
 		ArrayList<Graph> graphs = readGraphs();
 		Vector<FullTour> results = new Vector<>();
-		double startTemp = 10, alpha = 0.1, beta = 1.0000005  , approxZero=0.001;
-		graphs.parallelStream().forEach( (graph) -> {
+		ArrayList<Graph> parallelSource = new ArrayList<>();
+		for(int i = 0; i<8; i++){
+			parallelSource.add(graphs.get(7));
+		}
+		double startTemp = 10, alpha = 0.1, beta = 1.0000001  , approxZero=0.05;
+		parallelSource.parallelStream().forEach( (graph) -> {
 			try {
 				SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);
 				FullTour result = anne.SimAnneal(StartPointGenerator.Greedy(graph, 0));
@@ -71,7 +91,7 @@ public class TSP {
 		//found there are seldom changes made at temperatures under 0.05 --> set approxZero to 0.01 at the lowest;
 		// seldom changes made at temperatures above 5 --> set startTemp to 7 at the highest;
 		// beta as small as possible with good runtime
-		double startTemp = 10, alpha = 0.1, beta = 1.0000001  , approxZero=0.001;
+		double startTemp = 10, alpha = 0.1, beta = 1.00001  , approxZero=0.001;
 		SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);
 		FullTour result = anne.SimAnneal(StartPointGenerator.Greedy(graph, 0));
 		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
