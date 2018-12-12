@@ -37,6 +37,13 @@ public class GeneticSolver {
 		}
 	}
 	
+	public void randomPopulate() throws Exception{
+		while (population.size()< population.getBound()){
+			//add a new random tour to population
+			population.add(StartPointGenerator.random(graph));
+		}
+	}
+	
 	public void updateBestTour(){
 		if (bestWeight > population.get(0).computeWeight()){
 			bestTour = population.get(0);
@@ -82,7 +89,7 @@ public class GeneticSolver {
 	//for testing
 	public void printPopWeights(){
 		String out = "";
-		for(FullTour i : population.subList(0, 10)){
+		for(FullTour i : population.subList(0, 30)){
 			out += i.computeWeight() + ",";
 		}
 		System.out.println(out + "\n");

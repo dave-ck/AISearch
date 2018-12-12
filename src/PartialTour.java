@@ -1,10 +1,12 @@
 import java.util.HashSet;
+import java.util.Random;
 
 public class PartialTour extends Tour {
 	
 	private HashSet<Integer> unvisitedCities;
 	private int weight;
 	private int tail;
+	private Random random;
 	
 	// done & tested
 	public PartialTour(Graph g) {
@@ -17,6 +19,7 @@ public class PartialTour extends Tour {
 		for (int i = 0; i < getMatrix().length; i++) {
 			unvisitedCities.add(i);
 		}
+		this.random = new Random();
 	}
 	
 	
@@ -71,6 +74,22 @@ public class PartialTour extends Tour {
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean randomAppend() {
+		int len = unvisitedCities.size();
+		for(int city : unvisitedCities){
+			if (random.nextDouble() < 1/len){
+				append(city);
+				if (this.isComplete()) {
+					return false;
+				}
+				return true;
+			}
+			len--;
+		}
+		//all cities visited
+		return false;
 	}
 	
 	

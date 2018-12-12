@@ -6,10 +6,14 @@ import java.util.Random;
 public class Tests {
 	
 	public static void main(String[] args) throws Exception {
-		Graph g = new Graph("NEWAISearchfile180.txt");
-		GeneticSolver gen = new GeneticSolver(g, 50, 1000, 2, 0.2);
-		gen.greedyPopulate();
-		gen.run(300);
+		Graph g = new Graph("NEWAISearchfile535.txt");
+		GeneticSolver genGreedy = new GeneticSolver(g, 100, 120, 2, 0.1);
+		genGreedy.greedyPopulate();
+		genGreedy.run(30);
+		
+		GeneticSolver genRandom = new GeneticSolver(g, 100, 120, 2, 0.1);
+		genRandom.randomPopulate();
+		genRandom.run(30);
 		
 		
 	}

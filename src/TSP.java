@@ -69,9 +69,9 @@ public class TSP {
 		Vector<FullTour> results = new Vector<>();
 		ArrayList<Graph> parallelSource = new ArrayList<>();
 		for(int i = 0; i<8; i++){
-			parallelSource.add(graphs.get(7));
+			parallelSource.add(graphs.get(9));
 		}
-		double startTemp = 10, alpha = 0.1, beta = 1.0000001  , approxZero=0.05;
+		double startTemp = 10, alpha = 0.1, beta = 1.00000005  , approxZero=0.01;
 		parallelSource.parallelStream().forEach( (graph) -> {
 			try {
 				SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);

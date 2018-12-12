@@ -27,8 +27,14 @@ public class StartPointGenerator {
 			}
 		}
 		return new FullTour(currentPartialTour);
-		
-		
+	}
+	
+	public static FullTour random(Graph g) throws Exception {
+		PartialTour pt = new PartialTour(g);
+		while (pt.randomAppend()) {
+			//System.out.println(pt);
+		}
+		return new FullTour(pt);
 	}
 	
 }

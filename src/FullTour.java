@@ -66,7 +66,6 @@ public class FullTour extends Tour {
 		return subReversed(i, j);
 	}
 	
-	
 	public FullTour clone() {
 		ArrayList<Integer> cloneCities = new ArrayList<>();
 		//may cause issues as Integer is Object-type
