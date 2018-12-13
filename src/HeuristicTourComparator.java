@@ -7,7 +7,7 @@ public class HeuristicTourComparator implements Comparator<PartialTour> {
 	@Override
 	public int compare(PartialTour x, PartialTour y) {
 		
-		return x.computeWeight() - y.computeWeight();
+		return x.getWeight() - y.getWeight();
 	}
 }
 

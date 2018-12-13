@@ -18,13 +18,15 @@ public class SimAnnealer {
 		System.out.println("SimAnneal Called");
 		Random random = new Random();
 		FullTour currentTour = initialTour;
-		int currentWeight = initialTour.computeWeight();
+		int currentWeight = initialTour.getWeight();
 		FullTour currentBest = initialTour;
-		int currentBestWeight = initialTour.computeWeight();
+		int currentBestWeight = initialTour.getWeight();
 		FullTour successor;
 		int successorWeight;
 		int time = 0;
+		int timeChangeless = 0;
 		double currentTemperature = startTemp;
+		int timeOut = 1000000 + scheduleLength()/100;
 		System.out.println("Estimated schedule length: " + scheduleLength());
 		while (currentTemperature > approxZero){
 			double adaptedTemperature = currentTemperature;
@@ -33,8 +35,8 @@ public class SimAnnealer {
 			adaptedTemperature *= adaptiveFactor;
 			//comment out these 2 lines to make monotonic and non-adaptive
 			successor = currentTour.randomReversedSuccessor();
-			currentWeight = currentTour.computeWeight();
-			successorWeight = successor.computeWeight();
+			currentWeight = currentTour.getWeight();
+			successorWeight = successor.getWeight();
 			int deltaE = successorWeight - currentWeight;
 			if (deltaE <= 0) {
 				currentTour = successor;
@@ -46,13 +48,21 @@ public class SimAnnealer {
 				}
 			}
 			if (currentBestWeight > currentWeight) {
+				timeChangeless = 0;
 				currentBest = currentTour;
 				currentBestWeight = currentWeight;
 				System.out.println("Time: " + time + " adaptive factor: " + adaptiveFactor +
 						", current temperature: " + currentTemperature +  ", current best weight: " + currentBestWeight);
 			}
 			time++;
+			timeChangeless++;
 			currentTemperature /= beta;
+			
+			if (timeChangeless > timeOut){
+				timeChangeless = 0;
+				TSP.writeTour("Backups/Waddup"+System.currentTimeMillis(), currentBest);
+			}
+			
 		}
 		return currentBest;
 	}
@@ -99,14 +109,14 @@ public class SimAnnealer {
 	public  FullTour HillClimb(FullTour initial) {
 		FullTour current = initial;
 		FullTour optimal = initial;
-		int optimalWeight = initial.computeWeight();
+		int optimalWeight = initial.getWeight();
 		long time = System.nanoTime();
 		System.out.println(time);
 		do {
 			for (FullTour ft : current.getSuccessors()) {
-				if (ft.computeWeight() < optimalWeight) {
+				if (ft.getWeight() < optimalWeight) {
 					optimal = ft;
-					optimalWeight = ft.computeWeight();
+					optimalWeight = ft.getWeight();
 				}
 			}
 		} while (!current.equals(optimal) && System.nanoTime() < time + 50000000); //timeout after 50 seconds

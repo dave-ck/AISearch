@@ -38,6 +38,7 @@ public class PartialTour extends Tour {
 	
 	// done & tested (not for weight functionality)
 	public boolean append(int target) {
+		this.incorrectWeight();
 		if (unvisitedCities.remove(target)) {
 			/*
 			 * This code is made redundant by the computeWeight() method - could
@@ -58,6 +59,7 @@ public class PartialTour extends Tour {
 	}
 	
 	public boolean greedyAppend() {
+		this.incorrectWeight();
 		if (this.getCities().size() == 0) {
 			return false;
 		}
@@ -77,6 +79,7 @@ public class PartialTour extends Tour {
 	}
 	
 	public boolean randomAppend() {
+		this.incorrectWeight();
 		int len = unvisitedCities.size();
 		for(int city : unvisitedCities){
 			if (random.nextDouble() < 1/len){
@@ -127,6 +130,7 @@ public class PartialTour extends Tour {
 	
 	// done & tested
 	public PartialTour backTrack(int distance) {
+		incorrectWeight();
 		if (getCities().size() < distance) {
 			return new PartialTour(getGraph());
 		}

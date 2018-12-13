@@ -1,8 +1,8 @@
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class BoundedPriorityQueue<E> extends ArrayList<E>{
+public class BoundedPriorityQueue<E> extends Vector<E>{
 	
 	private int bound;
 	private Comparator<E> eComparator;
@@ -25,9 +25,9 @@ public class BoundedPriorityQueue<E> extends ArrayList<E>{
 			return true;
 		}
 		// if e is better than the worst existing element
-		if (eComparator.compare(get(bound), e)>0){
+		if (eComparator.compare(get(bound-1), e)>0){
 			//remove the "worst" existing element, substitute with e
-			this.remove(bound);
+			this.remove(bound-1);
 			this.add(e);
 			Collections.sort(this, eComparator);
 			return true;

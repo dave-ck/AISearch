@@ -4,6 +4,8 @@ public class Tour {
 	private ArrayList<Integer> cities;
 	private Graph graph;
 	private int[][] matrix;
+	private int weight;
+	private boolean weightCorrect;
 
 	public Tour(Graph g) {
 		cities = new ArrayList<Integer>();
@@ -57,11 +59,12 @@ public class Tour {
 		return stringForm;
 	}
 
-	public int computeWeight() {
+	public void computeWeight() {
 		if (size()==0){
-			return 0;
+			weight =  0;
+			return;
 		}
-		int weight = 0;
+		weight = 0;
 		int from = getRoot();
 		int to = -1;
 		for (int i : cities) {
@@ -72,9 +75,23 @@ public class Tour {
 		if (isComplete()) {
 			weight += matrix[to][getRoot()];
 		}
-		return weight;
 	}
 
+	public int getWeight() {
+		if (!weightCorrect){
+			computeWeight();
+			weightCorrect = true;
+		}
+		return weight;
+	}
+	
+	public void incorrectWeight(){
+		this.weightCorrect = false;
+	}
+	
+	public void setWeight(int newWeight){
+		this.weight = newWeight;
+	}
 	
 	public boolean visits(int city){
 		return cities.contains(city);

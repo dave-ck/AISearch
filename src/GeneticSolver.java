@@ -14,6 +14,7 @@ public class GeneticSolver {
 	private int parentsPerChild;
 	private FullTourWeightComparator comparator;
 	private double radiation;
+	private int graphSize;
 	
 	
 	public GeneticSolver(Graph g, int populationSize, int proliferation, int parentsPerChild, double radiation){
@@ -26,6 +27,8 @@ public class GeneticSolver {
 		this.parentsPerChild = parentsPerChild;
 		this.bestWeight = g.getMaxWeight()*g.getSize();
 		this.radiation = radiation;
+		this.graphSize = graph.getSize();
+		
 	}
 	
 	public void greedyPopulate() throws Exception{
@@ -45,9 +48,9 @@ public class GeneticSolver {
 	}
 	
 	public void updateBestTour(){
-		if (bestWeight > population.get(0).computeWeight()){
+		if (bestWeight > population.get(0).getWeight()){
 			bestTour = population.get(0);
-			bestWeight = bestTour.computeWeight();
+			bestWeight = bestTour.getWeight();
 		}
 	}
 	
@@ -90,7 +93,7 @@ public class GeneticSolver {
 	public void printPopWeights(){
 		String out = "";
 		for(FullTour i : population.subList(0, 30)){
-			out += i.computeWeight() + ",";
+			out += i.getWeight() + ",";
 		}
 		System.out.println(out + "\n");
 	}
@@ -105,30 +108,43 @@ public class GeneticSolver {
 	
 	public void tick() throws Exception{
 		BoundedPriorityQueue<FullTour> newGeneration = new BoundedPriorityQueue<>(populationSize, comparator);
+		ArrayList<ArrayList<FullTour>> listOfParentPairs = new ArrayList<>();
 		for (int i = 0; i<proliferation; i++){
 			//randomly select parents, with higher probability for parents of higher fitness
 			ArrayList<FullTour> parents = new ArrayList<>();
 			for(int j = 0; j < parentsPerChild; j++){
 				parents.add(randomParent());
 			}
-			FullTour child = edgeMapChild(parents, 1);
+			listOfParentPairs.add(parents);
 			//2-opt the child to induce randomness
-			while (random.nextDouble()<radiation){
-				child = child.randomReversedSuccessor();
-			}
-			newGeneration.add(child);
-			//population.add(edgeMapChild(parents, 1));
 		}
+		listOfParentPairs.parallelStream().forEach( (parents) -> {
+			try {
+				FullTour child = edgeMapChild(parents, 1);
+				//2-opt the child to induce randomness
+				while (random.nextDouble()<radiation){
+					child = child.randomReversedSuccessor();
+				}
+				newGeneration.add(child);
+				//swap out for population to preserver parents in population
+				//population.add(edgeMapChild(parents, 1));
+			}
+			catch (Exception e){
+				e.printStackTrace();
+			}
+			
+		});
 		population = newGeneration;
 		updateBestTour();
 	}
 	
+	
 	public void run(int generations) throws Exception{
 		for(int i = 0; i < generations; i++){
 			this.tick();
-			System.out.println("Generation: " + i + "; best \"live\" weight: " + population.get(0).computeWeight() +
-					"; best weight overall: " + bestWeight);
-			printPopWeights();
+			//System.out.println("Generation: " + i + "; best \"live\" weight: " + population.get(0).getWeight() +
+			//		"; best weight overall: " + bestWeight);
+			//printPopWeights();
 		}
 	}
 	

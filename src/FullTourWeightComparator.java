@@ -7,7 +7,7 @@ public class FullTourWeightComparator implements Comparator<FullTour> {
 	@Override
 	public int compare(FullTour x, FullTour y)
 	{
-		return x.computeWeight()-y.computeWeight();
+		return x.getWeight()-y.getWeight();
 	}
 }
 

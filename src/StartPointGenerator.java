@@ -20,7 +20,7 @@ public class StartPointGenerator {
 		while (!currentPartialTour.isComplete()) {
 			currentPartialTour = tourQueue.pop(0);
 			System.out.println("Current tour: " + currentPartialTour);
-			System.out.println("Weight: " + currentPartialTour.computeWeight());
+			System.out.println("Weight: " + currentPartialTour.getWeight());
 			System.out.println("Queue size: " + tourQueue.size() + "\n");
 			for (int i : currentPartialTour.getUnvisitedCities()) {
 				tourQueue.add(currentPartialTour.extend(i));

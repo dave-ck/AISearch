@@ -1,12 +1,14 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class TSP {
 	
 	public static void main(String[] args) throws Exception {
 		//masterCall();     //writes tour files for every implemented algorithm
-		writeToFile("Annealing", bestOnly(parallelAnnealing()));
+		writeTours("Annealing", bestOnly(parallelAnnealing(7)));
 	}
 	
 	public static void testCall() throws Exception{
@@ -18,13 +20,13 @@ public class TSP {
 		FullTour greedy = StartPointGenerator.Greedy(testGraph, 0);
 		FullTour annealGreedy = anne.SimAnneal(greedy);
 		FullTour annealLookAhead = anne.SimAnneal(boundedSearch);
-		System.out.println("Weight for bounded search: " + boundedSearch.computeWeight());
-		System.out.println("Weight for greedy: " + greedy.computeWeight());
-		System.out.println("Weight for annealed greedy: " + annealGreedy.computeWeight());
-		System.out.println("Weight for annealed lookahead: " + annealLookAhead.computeWeight());
+		System.out.println("Weight for bounded search: " + boundedSearch.getWeight());
+		System.out.println("Weight for greedy: " + greedy.getWeight());
+		System.out.println("Weight for annealed greedy: " + annealGreedy.getWeight());
+		System.out.println("Weight for annealed lookahead: " + annealLookAhead.getWeight());
 		ArrayList results = new ArrayList<FullTour>();
 		results.add(greedy);
-		writeToFile("Greedy", results);
+		writeTours("Greedy", results);
 	}
 	
 	
@@ -34,7 +36,7 @@ public class TSP {
 		HashSet<Integer> sizes = new HashSet<>();
 		for (FullTour ft : hasRepeats){
 			if (best.containsKey(ft.size())){
-				if (best.get(ft.size()).computeWeight() > ft.computeWeight()){
+				if (best.get(ft.size()).getWeight() > ft.getWeight()){
 					best.put(ft.size(), ft);
 				}
 			}
@@ -56,7 +58,7 @@ public class TSP {
 		}
 		double singleThreadTime = System.currentTimeMillis()-startTime;
 		startTime = System.currentTimeMillis();
-		writeToFile("ParallelOutput", parallelAnnealing());
+		writeTours("ParallelOutput", parallelAnnealing(9));
 		
 		double parallelTimeTaken = System.currentTimeMillis()-startTime;
 		System.out.println("Time to run in parallel: " + parallelTimeTaken + " ms");
@@ -64,17 +66,18 @@ public class TSP {
 		System.out.println("Time taken to run \"normally\": " + singleThreadTime + " ms");
 	}
 	
-	public static Vector<FullTour> parallelAnnealing() throws Exception{
+	public static Vector<FullTour> parallelAnnealing(int graphIndex) throws Exception{
 		ArrayList<Graph> graphs = readGraphs();
 		Vector<FullTour> results = new Vector<>();
 		ArrayList<Graph> parallelSource = new ArrayList<>();
 		for(int i = 0; i<8; i++){
-			parallelSource.add(graphs.get(9));
+			parallelSource.add(graphs.get(graphIndex));
 		}
-		double startTemp = 10, alpha = 0.1, beta = 1.00000005  , approxZero=0.01;
+		double startTemp = 3, beta = 1.00000005  , approxZero=0.001;
 		parallelSource.parallelStream().forEach( (graph) -> {
 			try {
 				SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);
+				// use 479 as start city for Greedy on 535 graph, as it has the best weight among greedy-generated graphs
 				FullTour result = anne.SimAnneal(StartPointGenerator.Greedy(graph, 0));
 				results.add(result);
 			} catch (Exception e) {
@@ -95,8 +98,8 @@ public class TSP {
 		SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);
 		FullTour result = anne.SimAnneal(StartPointGenerator.Greedy(graph, 0));
 		System.out.println("Params: startTemp = " + startTemp + " beta = " + beta + " approxZero = " + approxZero);
-		System.out.println("Result weight:" + result.computeWeight());
-		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph, 0).computeWeight());
+		System.out.println("Result weight:" + result.getWeight());
+		System.out.println("Greedy weight:" + StartPointGenerator.Greedy(graph, 0).getWeight());
 		System.out.println("Graph size: " + graph.getSize());
 		return result;
 	}
@@ -117,26 +120,37 @@ public class TSP {
 		}
 		System.out.println("writeToFile called");
 		
-		writeToFile("Greedy", greedyTours);
-		writeToFile("HillClimb", hillClimbingTours);
-		writeToFile("Annealing", annealingTours);
+		writeTours("Greedy", greedyTours);
+		writeTours("HillClimb", hillClimbingTours);
+		writeTours("Annealing", annealingTours);
 	}
 	
 	//TODO: change ...file58.txt to ...file058.txt
-	public static void writeToFile(String pathName, Collection<FullTour> tours) throws Exception {
+	public static void writeTours(String pathName, Collection<FullTour> tours) {
 		System.out.println("Printing tours...");
-		new File(pathName).mkdirs();
 		for (FullTour tour : tours) {
-			String x = "";
-			if (tour.size() < 99){
-				x += "0";
-			}
-			String outputFileName = "tourNEWAISearchfile" + x + tour.size() + ".txt";
-			PrintWriter writer = new PrintWriter(pathName + "/" + outputFileName, "UTF-8");
-			writer.println(tour);
-			writer.close();
+			writeTour(pathName, tour);
 		}
 		System.out.println("Successfully printed tours");
+	}
+	
+	public static void writeTour(String pathName, FullTour tour){
+		new File(pathName).mkdirs();
+		String x = "";
+		if (tour.size() < 99){
+			x += "0";
+		}
+		String outputFileName = "tourNEWAISearchfile" + x + tour.size() + ".txt";
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(pathName + "/" + outputFileName, "UTF-8");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		writer.println(tour);
+		writer.close();
 	}
 	
 	
