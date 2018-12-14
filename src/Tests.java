@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -7,7 +8,8 @@ import java.util.Random;
 public class Tests {
 	
 	public static void main(String[] args) throws Exception {
-		parameterize_genetic();
+		parameterize_genetic(new ArrayList<Integer>(Arrays.asList(1000, 1100, 1200, 1500, 2000, 3000, 5000)),       //pro
+					new ArrayList<Double>(Arrays.asList(0.1, 0.2, 0.3, 0.35,  0.4, 0.45, 0.5)));                              //rad
 	
 	}
 	
@@ -41,13 +43,18 @@ public class Tests {
 		}
 	}
 	
-	public static void parameterize_genetic() throws Exception{
+	public static void parameterize_genetic(ArrayList<Integer> proliferations, ArrayList<Double> radiations) throws Exception{
+		PrintWriter writer = new PrintWriter("genetic_params.csv", "UTF-8");
+		String currentLine = "pro\\rad, ";
+		for (double i: radiations){
+			currentLine += i + ", ";
+		}
+		writer.println(currentLine);
 		Graph g = new Graph("NEWAISearchfile535.txt");
-		int eachSetup_seconds = 10;
+		int eachSetup_seconds = 30;
 		int eachSetup_millis = 1000*eachSetup_seconds;
-		ArrayList<Integer> proliferations = new ArrayList<>(Arrays.asList(1000, 1500, 2000, 3000, 5000));
-		ArrayList<Double> radiations = new ArrayList<>(Arrays.asList(0.3, 0.4, 0.45));
 		for (int pro : proliferations){
+			currentLine = "" + pro + ", ";
 			for (double rad : radiations){
 				double time = System.currentTimeMillis();
 				int iterations = 0;
@@ -57,9 +64,14 @@ public class Tests {
 					genGreedy.run(1);
 					iterations++;
 				}
+				currentLine += genGreedy.getBestTour().getWeight() + ", ";
 				System.out.println("Greedy pop, " + iterations +" iterations, pro: " + pro + " rad: " + rad + " weight: " + genGreedy.getBestTour().getWeight());
 			}
+			writer.println(currentLine);
 		}
+		
+		writer.close();
+		
 		
 		
 		
@@ -98,4 +110,6 @@ public class Tests {
 		double timeTaken = System.currentTimeMillis()-time;
 		System.out.println("Time taken for pow = " + pow + ": " + (timeTaken/1000) + "\n");
 	}
+	
+	
 }

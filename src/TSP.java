@@ -7,9 +7,28 @@ import java.util.*;
 public class TSP {
 	
 	public static void main(String[] args) throws Exception {
-		//masterCall();     //writes tour files for every implemented algorithm
-		writeTours("Annealing", bestOnly(parallelAnnealing(7)));
+		for (int i = 9; i > -1; i--){
+			writeTour("GeneticFinal", geneticCall(i));
+		}
+		parallelAnnealing(9);
+		
 	}
+	
+	public static FullTour geneticCall(int graph) throws Exception{
+		Graph g = readGraphs().get(graph);
+		GeneticSolver gene = new GeneticSolver(g, 1000, 3000, 2, 0.8);
+		gene.greedyPopulate();
+		// irradiate population heavily initially to induce some "interesting" random edges at first
+		gene.run(10);
+		gene.setRadiation(0.45);
+		gene.setProliferation(2000);
+		for (int i = 1; i < 600 ; i += 1){
+			gene.run(60);
+			writeTour("Genetic", gene.getBestTour());
+		}
+		return gene.getBestTour();
+	}
+	
 	
 	public static void testCall() throws Exception{
 		double startTemp = 3, alpha = 0.1, beta = 1.00001 , approxZero=0.00001;
@@ -29,6 +48,9 @@ public class TSP {
 		writeTours("Greedy", results);
 	}
 	
+	public static void singleGraphParAnneal(int graph) throws Exception{
+		writeTours("Annealing", bestOnly(parallelAnnealing(graph)));
+	}
 	
 	// compiles a list with only the best tour for each size in the input list
 	public static ArrayList<FullTour> bestOnly(Collection<FullTour> hasRepeats){
@@ -73,7 +95,7 @@ public class TSP {
 		for(int i = 0; i<8; i++){
 			parallelSource.add(graphs.get(graphIndex));
 		}
-		double startTemp = 3, beta = 1.00000005  , approxZero=0.001;
+		double startTemp = 10, beta = 1.00000005  , approxZero=0.001;
 		parallelSource.parallelStream().forEach( (graph) -> {
 			try {
 				SimAnnealer anne = new SimAnnealer(startTemp, beta, approxZero);

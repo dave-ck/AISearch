@@ -15,7 +15,7 @@ public class GeneticSolver {
 	private FullTourWeightComparator comparator;
 	private double radiation;
 	private int graphSize;
-	
+	private int worldAge;
 	
 	public GeneticSolver(Graph g, int populationSize, int proliferation, int parentsPerChild, double radiation){
 		this.comparator = new FullTourWeightComparator();
@@ -51,6 +51,7 @@ public class GeneticSolver {
 		if (bestWeight > population.get(0).getWeight()){
 			bestTour = population.get(0);
 			bestWeight = bestTour.getWeight();
+			System.out.println("World age: " + worldAge + " New best tour found: " + bestWeight);
 		}
 	}
 	
@@ -106,6 +107,14 @@ public class GeneticSolver {
 		return population.get(index);
 	}
 	
+	public void setRadiation(double radiation){
+		this.radiation = radiation;
+	}
+	
+	public void setProliferation(int proliferation){
+		this.proliferation = proliferation;
+	}
+	
 	public void tick() throws Exception{
 		BoundedPriorityQueue<FullTour> newGeneration = new BoundedPriorityQueue<>(populationSize, comparator);
 		ArrayList<ArrayList<FullTour>> listOfParentPairs = new ArrayList<>();
@@ -136,6 +145,7 @@ public class GeneticSolver {
 		});
 		population = newGeneration;
 		updateBestTour();
+		worldAge++;
 	}
 	
 	
